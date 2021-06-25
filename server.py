@@ -71,7 +71,7 @@ import random
 # #              "v", "w", "x", "y", "z","1","2","3","4","5","6","7","8","9","0"], 6):
 # #     # if "".join(comb) == "alihas":
 # #     print("".join(comb))
-done = []
+# done = []
 #
 # from datetime import datetime
 # start=datetime.now()
@@ -93,17 +93,17 @@ done = []
 # #
 # # print(datetime.now()-start)
 # #
-
-
-def password_generator(letters, length):
-    first_random_letter = first_letters[random.randint(0,len(first_letters)-1)]
-    if first_random_letter not in done:
-        # print(first_random_letter)
-        copy_first = first_letters.copy()
-        copy_first[0] = first_letters[first_letters.index(first_random_letter)]
-        copy_first[first_letters.index(first_random_letter)] ="a"
-        for comb in itertools.product(copy_first,repeat=length):
-            return "".join(comb)
-
-for var in range(len(first_letters)):
-    print(password_generator(first_letters,3))
+#
+#
+# def password_generator(letters, length):
+#     first_random_letter = first_letters[random.randint(0,len(first_letters)-1)]
+#     if first_random_letter not in done:
+#         # print(first_random_letter)
+#         copy_first = first_letters.copy()
+#         copy_first[0] = first_letters[first_letters.index(first_random_letter)]
+#         copy_first[first_letters.index(first_random_letter)] ="a"
+#         for comb in itertools.product(copy_first,repeat=length):
+#             return "".join(comb)
+#
+# for var in range(len(first_letters)):
+#     print(password_generator(first_letters,3))
