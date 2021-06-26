@@ -5,7 +5,9 @@ import time
 from PyQt5.QtCore import pyqtSignal, QThread, QObject, pyqtSlot
 from PyQt5.QtWidgets import QFileDialog
 
+import card_validator
 import client_post
+import hamming_code
 
 
 class Ui(QtWidgets.QMainWindow):
@@ -15,6 +17,8 @@ class Ui(QtWidgets.QMainWindow):
     dictionary = False
     file = None
     letter_num = None
+    evenParity = None
+    oddParity = None
 
     def __init__(self):
         super(Ui, self).__init__() # Call the inherited classes __init__ method
@@ -37,9 +41,18 @@ class Ui(QtWidgets.QMainWindow):
 
         self.end_btn.clicked.connect(self.end_process)
 
+        ## related to the card thingy
+        self.cardValidateBtn.clicked.connect(self.validate_card)
+        self.validLbl.setHidden(True)
+        self.invalidLbl.setHidden(True)
 
+        ## related to the hamming code
 
-
+        self.hammingCodeBtn.clicked.connect(self.check_hamming_code)
+        self.evenRadioBtn.toggled.connect(self.evenRadioOnlick)
+        self.oddRadioBtn.toggled.connect(self.oddRadioOnlick)
+        self.errorLbl.setHidden(True)
+        self.noErrorLbl.setHidden(True)
 
 
         # self.show() # Show the GUI
@@ -63,21 +76,7 @@ class Ui(QtWidgets.QMainWindow):
     #     self.logTxtEdit.appendPlainText("Hello")
 
     def startProcess(self):
-        # # print(self.url_txtbox.text())
-        # self.threadclass = ThreadClass()
-        # self.threadclass.start()
-        # # self.sig.connect(self.)
-        #
-        # if client_post.connect_to_endpoint(self.url_txtbox.text()):
-        #     self.conn_lbl.setText(self.conn_lbl.text()+self.url_txtbox.text())
-        #     time.sleep(1)
-        # # set character set
-        # first_letters = client_post.set_characters_based_on_user(Ui.lower,Ui.number)
-        # self.logTxtEdit.setReadOnly(True)
-        # while(1):
-        #     client_post.runAttack(first_letters,self.url_txtbox.text(),Ui.file)
-        #     self.logTxtEdit.appendPlainText(client_post.current_permutation)
-        #
+
         print(Ui.file)
         b=d=None
         if Ui.brute and Ui.dictionary:
@@ -124,6 +123,46 @@ class Ui(QtWidgets.QMainWindow):
     def num_chkbox_onclick(self,state):
         if state == QtCore.Qt.Checked:
             Ui.number = True
+
+    ## related to the card thingy
+    def validate_card(self):
+        self.logTxt.clear()
+        self.validLbl.setHidden(True)
+        self.invalidLbl.setHidden(True)
+        v = card_validator.LuhmAlgorithm(self.cardNumTxt.text())
+        if v.validate():
+            self.validLbl.setHidden(False)
+        else:
+            self.invalidLbl.setHidden(False)
+        self.logTxt.appendPlainText("\n".join(v.logs))
+
+    ## hamming  code related
+    def evenRadioOnlick(self):
+        if self.evenRadioBtn.isChecked():
+            self.evenParity =True
+    def oddRadioOnlick(self):
+        if self.evenRadioBtn.isChecked():
+            self.oddParity   = True
+    def check_hamming_code(self):
+        self.hamLogTxt.clear()
+        self.errorLbl.setHidden(True)
+        self.noErrorLbl.setHidden(True)
+        if self.evenParity:
+            ham_obj = hamming_code.HammingCode(self.hammingCodeTxt.text(),"0")
+        else:
+            ham_obj = hamming_code.HammingCode(self.hammingCodeTxt.text(),"1")
+        print(ham_obj.hasError)
+        print(ham_obj.error_index)
+        if ham_obj.hasError and ham_obj.error_index != 0:
+            self.errorLbl.setHidden(False)
+            ham_obj.correct_error()
+
+            self.hamLogTxt.appendPlainText("\n".join(ham_obj.logs))
+        else:
+            self.noErrorLbl.setHidden(False)
+        self.evenParity =False
+        self.oddParity =False
+
 
 
 class Worker(QObject):
